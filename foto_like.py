@@ -44,15 +44,28 @@ def foto_like():
                     except ValueError:
                         # print '???', notes
                         pocet = 0
-                    fotky.append((sibling['href'], pocet))
+                    fotky.append((sibling['href'], pocet, notes, len(notes)))
     print 'stránek :', i-1
     print 'fotek   :', len(fotky)
+    return fotky
+
+def foto_sort(fotky):
+    vfp.remove(outfile)
+
+    '''
+    outfile2 = 'fotky2.csv'
+    vfp.remove(outfile2)
+    for fotka in fotky:
+        vfp.strtofile('%s, %s\n' % (fotka[0], fotka[1], fotka[2], fotka[3]), outfile2, 1)
+    '''
+        
     fotky.sort(key=lambda item:item[1], reverse=True)
     for fotka in fotky:
-        vfp.strtofile('%s, %s\n' % (fotka[0], fotka[1]), outfile, 1)
+        vfp.strtofile('%s, %s, %s, %s\n' % (
+                        fotka[0], fotka[1], fotka[2], fotka[3]), outfile, 1)
       
 if __name__=='__main__':
-    foto_like()
+    foto_sort(foto_like())
 
 '''
             		if isinstance(sibling, Tag) and sibling.name=='a':
