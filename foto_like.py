@@ -37,14 +37,14 @@ def foto_like():
         for foto in fotos:
             for sibling in foto.next_siblings:
                 if isinstance(sibling, Tag) and sibling.name=='a':
-                    notes = sibling.find_all('div', 'notes')[0].text
+                    notes = sibling.find_all('div', 'notes')[0].text.strip()
                     try:
-                        pocet = int(notes
-                                .strip().rsplit(' ', 1)[0].replace(' ','')) 
+                        pocet = int(notes.rsplit(' ', 1)[0].replace(' ','')) 
                     except ValueError:
                         # print '???', notes
                         pocet = 0
                     fotky.append((sibling['href'], pocet, notes, len(notes)))
+                        # 2,3: pro kontrolu správnosti celý text (notes) a jeho délka 
     print 'stránek :', i-1
     print 'fotek   :', len(fotky)
     return fotky
@@ -61,8 +61,10 @@ def foto_sort(fotky):
         
     fotky.sort(key=lambda item:item[1], reverse=True)
     for fotka in fotky:
-        vfp.strtofile('%s, %s, %s, %s\n' % (
-                        fotka[0], fotka[1], fotka[2], fotka[3]), outfile, 1)
+        #vfp.strtofile('%s, %s, %s, %s\n' % (
+        #                fotka[0], fotka[1], fotka[2], fotka[3]), outfile, 1)
+        vfp.strtofile('%s, %s\n' % (
+                        fotka[0], fotka[1]), outfile, 1)
       
 if __name__=='__main__':
     foto_sort(foto_like())
