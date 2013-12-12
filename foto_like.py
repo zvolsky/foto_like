@@ -15,7 +15,7 @@
 
 import vfp
 import urllib2
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 base = 'http://blog.jozefsebin.cz/page/'
 outfile = 'fotky.csv'
@@ -29,21 +29,39 @@ def foto_like():
             pg = urllib2.urlopen(base + '%s'%i).read()
             print i
         except:
-            print 'stránek :', i-1
             break
         soup = BeautifulSoup(pg)
         fotos = soup.find_all('div', 'copy')
+        if not len(fotos):
+            break
         for foto in fotos:
             for sibling in foto.next_siblings:
-            		if isinstance(sibling, Tag) and sibling.name=='a':
-              			fotky.append((
-                        sibling['href'],
-                        int(sibling.find_all('div', 'notes')[0].text.strip()
-                                    .rsplit(' ', 1)[0].replace(' ',''))
-                        ))
+                if isinstance(sibling, Tag) and sibling.name=='a':
+                    notes = sibling.find_all('div', 'notes')[0].text
+                    try:
+                        pocet = int(notes
+                                .strip().rsplit(' ', 1)[0].replace(' ','')) 
+                    except ValueError:
+                        # print '???', notes
+                        pocet = 0
+                    fotky.append((sibling['href'], pocet))
+    print 'stránek :', i-1
     print 'fotek   :', len(fotky)
-    for fotka in fotky.sort(key=lambda item:item[1], reverse=True):
+    fotky.sort(key=lambda item:item[1], reverse=True)
+    for fotka in fotky:
         vfp.strtofile('%s, %s\n' % (fotka[0], fotka[1]), outfile, 1)
       
 if __name__=='__main__':
     foto_like()
+
+'''
+            		if isinstance(sibling, Tag) and sibling.name=='a':
+                    notes = sibling.find_all('div', 'notes')[0].text
+                    try:
+                        pocet = int(notes
+                                .strip().rsplit(' ', 1)[0].replace(' ','')) 
+                    except ValueError:
+                        print '???', notes
+                        pocet = 0
+              			fotky.append((sibling['href'], pocet))
+'''
